@@ -1,27 +1,27 @@
-import mongoose from 'mongoose';
+import { Schema, model } from 'mongoose';
 
-const DatesSchema = new mongoose.Schema({
-  Estudiante_nombre: {
+const DatesSchema = new Schema({
+  name_pet: {
     type: String,
     required: true,
   },
-  Estudiante_carrera: {
+  age_pet: {
     type: String,
     required: true,
   },
-  Respuesta_1: {
+  name_user: {
     type: String,
     required: true,
   },
-  Respuesta_2: {
+  constact_number: {
     type: String,
     required: true,
   },
-  Respuesta_3: {
+  description: {
     type: String,
     required: true,
   },
-  Respuesta_4: {
+  date: {
     type: String,
     required: true,
   },

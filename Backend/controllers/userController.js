@@ -64,7 +64,7 @@ export default {
       });
       return;
     }
-  },
+  }, 
 
   updateUser: async (req, res) => {
     try {

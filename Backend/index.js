@@ -1,5 +1,8 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import cors from "cors";
+// import { DatesModel } from './models/DatesModels.js';
+import { AnswerModel } from './models/AnswersModel.js';
 /* import formRoutes from './routes/formRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import surveyRoutes from './routes/surveyRoutes.js'; */
@@ -45,6 +48,68 @@ app.put("/user/update/:id", userController.updateUser);
 app.get("/users", userController.getAllUsers);
 app.get("/user/:id", userController.getUser);
 app.post("/login", userController.login);
+
+app.post("/save-answers", async (req, res)=>{
+  console.log(req.body)
+  //Arreglo del 1 al 15
+  const numberOfQuestions = Array.from(Array(15).keys());
+  let flag = true;
+  for (const nQ of numberOfQuestions){
+    console.log()
+    if (!req.body[`pregunta_${nQ}`]) {
+      flag = false;
+    }
+  }
+  if (!flag){
+    return res.status(400).json({msg: "Datos inclompletos"})
+  }
+
+  try {
+    await AnswerModel.create(req.body);
+    return res.status(200).json({msg:"Datos almacenados con exito"})
+  } catch (error) {
+    return res.status(500).json({msg:"Algo salio mal al guardar las respuestas"})
+  }
+})
+
+app.get("/get-answers", async (req, res) => {
+  return res.status(200).json(await AnswerModel.find())
+})
+
+app.get("/get-answers-to-chart", async (req, res) => {
+  const allAnswers = await AnswerModel.find();
+  let totalMuyInsatisfecho = 0;
+  let totalInsatisfecho = 0;
+  let totalNeutral = 0;
+  let totalSatisfecho = 0;
+  let totalMuySatisfecho = 0;
+
+  for (const answer of allAnswers) {
+      for (let i = 0; i < 15; i++) {
+          const answerPerQuestion = answer[`pregunta_${i}`];
+          
+          if (answerPerQuestion === "Muy insatisfecho") {
+            totalMuyInsatisfecho++
+          } else if (answerPerQuestion === "Insatisfecho") {
+            totalInsatisfecho++
+          } else if (answerPerQuestion === "Neutral") {
+            totalNeutral++
+          } else if (answerPerQuestion === "Satisfecho") {
+            totalSatisfecho++
+          } else if (answerPerQuestion === "Muy satisfecho") {
+            totalMuySatisfecho++;
+          }
+      }
+  }
+
+  return res.status(200).json([
+    totalMuyInsatisfecho,
+    totalInsatisfecho,
+    totalNeutral,
+    totalSatisfecho,
+    totalMuySatisfecho
+  ])
+})
 
 
   app.listen(4000, () => {
